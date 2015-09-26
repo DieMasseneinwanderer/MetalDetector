@@ -15,6 +15,9 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+    public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
         if (requestCode == SCAN_QR_CODE && resultCode == RESULT_OK) {
             Intent logIntent = new Intent("ch.appquest.intent.LOG");
 
@@ -116,9 +119,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
 
             // Achtung, je nach App wird etwas anderes eingetragen
-            String logmessage = intent.getStringExtra("SCAN_RESULT");
-            logIntent.putExtra("ch.appquest.logmessage", logmessage);
-
+            String logmessage = resultIntent.getStringExtra("SCAN_RESULT");
+            JSONObject jsonLog = new JSONObject();
+            try {
+                jsonLog.put("task", "Metalldetektor");
+                jsonLog.put("solution", logmessage);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            logIntent.putExtra("ch.appquest.logmessage", jsonLog.toString());
             startActivity(logIntent);
         }
     }
